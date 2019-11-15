@@ -46,13 +46,14 @@ public class NauEspaial extends javax.swing.JFrame {
 
 class PanelNau extends JPanel implements Runnable, KeyListener {
 	private int numNaus = 3;
-	Nau[] nau;
+	ArrayList<Nau> nau;
 	Nau nauPropia;
 	ArrayList<Dispar> dispar = new ArrayList<Dispar>();
 
 	public PanelNau() {
-		nau = new Nau[numNaus];
-		for (int i = 0; i < nau.length; i++) {
+		//nau = new Nau[numNaus];
+		nau = new ArrayList<Nau>();
+		for (int i = 0; i < numNaus; i++) {
 			Random rand = new Random();
 			int velocitat = (rand.nextInt(3) + 5) * 10;
 			int posX = rand.nextInt(100) + 30;
@@ -60,7 +61,7 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			int dX = rand.nextInt(3) + 1;
 			int dY = rand.nextInt(3) + 1;
 			String nomNau = Integer.toString(i);
-			nau[i] = new Nau(nomNau, posX, posY, dX, dY, velocitat);
+			nau.add(new Nau(nomNau, posX, posY, dX, dY, velocitat));
 		}
 
 		// Creo la nau propia
@@ -78,30 +79,48 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 	}
 
 	public void run() {
+		boolean execucio = true;
 		System.out.println("Inici fil repintar");
-		while (true) {
+		while (execucio) {
 			try {
 				Thread.sleep(100);
 			} catch (Exception e) {
 			} // espero 0,1 segons
 			// System.out.println("Repintant");
-			repaint();
+			if(nau.isEmpty()) {
+				execucio = false;
+				System.exit(0);
+			}else {
+				repaint();
+			}
 		}
 	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for (int i = 0; i < nau.length; ++i)
-			nau[i].pinta(g);
+		for (int i = 0; i < nau.size(); ++i)
+			
+			nau.get(i).pinta(g);
 		nauPropia.pinta(g);
 		for(int i = 0; i < dispar.size(); i++) {
 			// si arriva als marges ...
 			
 			if (dispar.get(i).getY() >= 500 - dispar.get(i).getTy() || dispar.get(i).getY() <= dispar.get(i).getTy()) {
 				dispar.remove(i);
+				i--;
 			}else {
 				dispar.get(i).pinta(g);
+			for(int j = 0; j < nau.size(); j++) {
+				double referencia = Math.sqrt(Math.pow((dispar.get(i).getX()-nau.get(j).getX()), 2) + 
+						Math.pow((dispar.get(i).getY()-nau.get(j).getY()), 2));
+				if (referencia < 100.0) {
+					nau.remove(j);
+					//System.out.println("ha tocat");
+					j--;
+				}
 			}
+			}
+			
 		}
 	}
 
@@ -121,7 +140,7 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			nauPropia.dreta();
 		} // System.out.println("a la dreta"); }
 		if (e.getKeyCode() == 32) {
-			Dispar disp = new Dispar(nauPropia.getX() + 50, nauPropia.getY() -120, -10, 100);
+			Dispar disp = new Dispar(nauPropia.getX(), nauPropia.getY(), -10, 100);
 			dispar.add(disp);
 		}
 	}
