@@ -98,27 +98,35 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		for (int i = 0; i < nau.size(); ++i)
-			
+		for (int i = 0; i < nau.size(); ++i) {
 			nau.get(i).pinta(g);
+		}
 		nauPropia.pinta(g);
+		for (int i = 0; i < nau.size(); i++) {
+			double referencia = Math.sqrt(Math.pow((nau.get(i).getX()-nauPropia.getX()), 2) + 
+					Math.pow((nau.get(i).getY()-nauPropia.getY()), 2));
+			if(referencia < 100.0) {
+				System.out.println("GAME OVER!");
+				System.exit(0);
+			}
+		}
 		for(int i = 0; i < dispar.size(); i++) {
 			// si arriva als marges ...
 			
 			if (dispar.get(i).getY() >= 500 - dispar.get(i).getTy() || dispar.get(i).getY() <= dispar.get(i).getTy()) {
 				dispar.remove(i);
 				i--;
-			}else {
+			} else {
 				dispar.get(i).pinta(g);
-			for(int j = 0; j < nau.size(); j++) {
-				double referencia = Math.sqrt(Math.pow((dispar.get(i).getX()-nau.get(j).getX()), 2) + 
-						Math.pow((dispar.get(i).getY()-nau.get(j).getY()), 2));
-				if (referencia < 100.0) {
-					nau.remove(j);
-					//System.out.println("ha tocat");
-					j--;
+				for(int j = 0; j < nau.size(); j++) {
+					double referencia = Math.sqrt(Math.pow((dispar.get(i).getX()-nau.get(j).getX()), 2) + 
+							Math.pow((dispar.get(i).getY()-nau.get(j).getY()), 2));
+					if (referencia < 100.0) {
+						nau.remove(j);
+						//System.out.println("ha tocat");
+						j--;
+					}
 				}
-			}
 			}
 			
 		}
@@ -219,7 +227,7 @@ class Nau extends Thread {
 	}
 }
 
-class Dispar extends JPanel implements Runnable {
+class Dispar extends Thread {
 	private int x;
 	private int y;
 	private int dsy, v;
@@ -265,10 +273,9 @@ class Dispar extends JPanel implements Runnable {
 	public void moviment() {
 		this.dsy = 10;
 	}
-
-	public void dispara() {
-		
-		moviment();
+	
+	public int getX() {
+		return x;
 	}
 
 	public int getY() {
