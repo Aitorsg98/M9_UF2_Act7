@@ -45,7 +45,7 @@ public class NauEspaial extends javax.swing.JFrame {
 }
 
 class PanelNau extends JPanel implements Runnable, KeyListener {
-	private int numNaus = 3;
+	private int numNaus = 10;
 	ArrayList<Nau> nau;
 	Nau nauPropia;
 	ArrayList<Dispar> dispar = new ArrayList<Dispar>();
@@ -87,6 +87,7 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			} catch (Exception e) {
 			} // espero 0,1 segons
 			// System.out.println("Repintant");
+			//Si no hi ha cap nau, el joc finalitzarà
 			if(nau.isEmpty()) {
 				execucio = false;
 				System.exit(0);
@@ -102,6 +103,8 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			nau.get(i).pinta(g);
 		}
 		nauPropia.pinta(g);
+		//Aqui recorrem l'arrayList de naus enemigues per comprovar si xoquen contra la
+		//nau propia. En cas afirmatiu, el joc s'acaba
 		for (int i = 0; i < nau.size(); i++) {
 			double referencia = Math.sqrt(Math.pow((nau.get(i).getX()-nauPropia.getX()), 2) + 
 					Math.pow((nau.get(i).getY()-nauPropia.getY()), 2));
@@ -111,13 +114,16 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			}
 		}
 		for(int i = 0; i < dispar.size(); i++) {
-			// si arriva als marges ...
+			// Si els dispars arriben a la part superior de la pantalla, fem que desapareguin
 			
 			if (dispar.get(i).getY() >= 500 - dispar.get(i).getTy() || dispar.get(i).getY() <= dispar.get(i).getTy()) {
 				dispar.remove(i);
 				i--;
 			} else {
+				//En cas contrari, els mostrem en pantalla
 				dispar.get(i).pinta(g);
+				//Recorrem l'arrayList de naus per a comprovar si els dispars toquen les naus
+				//enemigues. En cas afirmatiu, esborrem la nau en qüestió
 				for(int j = 0; j < nau.size(); j++) {
 					double referencia = Math.sqrt(Math.pow((dispar.get(i).getX()-nau.get(j).getX()), 2) + 
 							Math.pow((dispar.get(i).getY()-nau.get(j).getY()), 2));
@@ -148,6 +154,8 @@ class PanelNau extends JPanel implements Runnable, KeyListener {
 			nauPropia.dreta();
 		} // System.out.println("a la dreta"); }
 		if (e.getKeyCode() == 32) {
+			//Si apretem la barra espaiadora, el programa crearà tants objectes de tipus Dispar
+			//com quantitat de vegades haguem apretat la tecla.
 			Dispar disp = new Dispar(nauPropia.getX(), nauPropia.getY(), -10, 100);
 			dispar.add(disp);
 		}
